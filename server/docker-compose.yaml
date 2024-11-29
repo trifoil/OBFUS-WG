@@ -1,43 +1,22 @@
-
 services:
-
-  
   wireguard:
     image: linuxserver/wireguard
     container_name: wireguard
     cap_add:
       - NET_ADMIN
-      - SYS_MODULE
     environment:
-      - PUID=1000                  # Replace with your user ID
-      - PGID=1000                  # Replace with your group ID
-      - TZ=Europe/Brussels                # Replace with your timezone
-      - SERVERPORT=51820           # Internal WireGuard port
-      - PEERS=1                    # Number of WireGuard peers (clients)
-      - PEERDNS=auto               # Use automatic DNS for clients
-      - INTERNAL_SUBNET=10.13.13.0/24 # Subnet for the VPN
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Brussels
+      - SERVERPORT=51820
+      - PEERS=2
+      - PEERDNS=auto
     volumes:
-      - /storage/vpn/wireguard-config:/config
-      - /lib/modules:/lib/modules
-    extra_hosts:
-    - "iptables-nft:iptables" # Passthrough for nftables compatibility
-    restart: unless-stopped
-
-  shadowsocks:
-    image: shadowsocks/shadowsocks-libev
-    container_name: shadowsocks
-    command:
-      - ss-server
-      - -s 0.0.0.0                 # Listen on all interfaces
-      - -p 8388                    # Shadowsocks port
-      - -k your_password           # Replace with a strong password
-      - -m aes-256-gcm             # Encryption method
-      - --plugin v2ray-plugin
-      - --plugin-opts "server;path=/wireguard-ws"
-    restart: unless-stopped
+      - /storage/vpn/wireguard:/config
+      - /lib/modules:/lib/modules:ro
     ports:
-      - "8388:8388"                # Expose Shadowsocks port
+      - "51820:51820/udp"
+    extra_hosts:
+      - "iptables-nft:iptables" # Passthrough for nftables compatibility
+    restart: unless-stopped
 
-networks:
-  default:
-    driver: bridge
