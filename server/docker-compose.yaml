@@ -8,13 +8,13 @@ services:
       - NET_ADMIN
       - SYS_MODULE
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - SERVERPORT=51820
-      - PEERS=1
-      - PEERDNS=auto
-      - INTERNAL_SUBNET=10.13.13.0/24
+      - PUID=1000                  # Replace with your user ID
+      - PGID=1000                  # Replace with your group ID
+      - TZ=Etc/UTC                 # Replace with your timezone
+      - SERVERPORT=51820           # Internal WireGuard port
+      - PEERS=1                    # Number of WireGuard peers (clients)
+      - PEERDNS=auto               # Use automatic DNS for clients
+      - INTERNAL_SUBNET=10.13.13.0/24 # Subnet for the VPN
     volumes:
       - ./wireguard-config:/config
     restart: unless-stopped
@@ -24,15 +24,15 @@ services:
     container_name: shadowsocks
     command:
       - ss-server
-      - -s 127.0.0.1
-      - -p 8388
-      - -k your_password
-      - -m aes-256-gcm
+      - -s 0.0.0.0                 # Listen on all interfaces
+      - -p 8388                    # Shadowsocks port
+      - -k your_password           # Replace with a strong password
+      - -m aes-256-gcm             # Encryption method
       - --plugin v2ray-plugin
       - --plugin-opts "server;path=/wireguard-ws"
     restart: unless-stopped
     ports:
-      - "8388:8388"
+      - "8388:8388"                # Expose Shadowsocks port
 
 networks:
   default:
