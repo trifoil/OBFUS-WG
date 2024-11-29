@@ -20,7 +20,7 @@ services:
     restart: unless-stopped
 
   shadowsocks:
-    image: /storage/vpn/shadowsocks/shadowsocks-libev
+    image: shadowsocks/shadowsocks-libev
     container_name: shadowsocks
     command:
       - ss-server
