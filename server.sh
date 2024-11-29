@@ -1,32 +1,32 @@
 #!/bin/bash 
 cd server 
 
-#!/bin/bash
-
-# Define variables
+# Variables
 DOCKERFILE="Dockerfile"
-IMAGE_NAME="custom-wireguard"
-COMPOSE_OVERRIDE="docker-compose.override.yml"
+CUSTOM_IMAGE="custom-wireguard"
+OVERRIDE_FILE="docker-compose.override.yml"
 
-# Step 1: Create the Dockerfile
-echo "Creating Dockerfile..."
+# Step 1: Create the Dockerfile for the custom WireGuard image
+echo "Creating Dockerfile for custom WireGuard image..."
 cat <<EOF > $DOCKERFILE
 FROM linuxserver/wireguard
-RUN apk add --no-cache iptables-nft
+
+# Install iptables for nftables compatibility
+RUN apk add --no-cache iptables
 EOF
 
 # Step 2: Build the custom Docker image
-echo "Building custom Docker image: $IMAGE_NAME..."
-docker build -t $IMAGE_NAME .
+echo "Building custom Docker image: $CUSTOM_IMAGE..."
+docker build -t $CUSTOM_IMAGE .
 
-# Step 3: Create docker-compose.override.yml
-echo "Creating $COMPOSE_OVERRIDE..."
-cat <<EOF > $COMPOSE_OVERRIDE
+# Step 3: Create a docker-compose.override.yml file to use the custom image
+echo "Creating $OVERRIDE_FILE to override WireGuard service..."
+cat <<EOF > $OVERRIDE_FILE
 version: '3.8'
 
 services:
   wireguard:
-    image: $IMAGE_NAME
+    image: $CUSTOM_IMAGE
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
@@ -35,13 +35,13 @@ services:
       - /usr/src:/usr/src:ro
 EOF
 
-# Step 4: Deploy the stack
+# Step 4: Deploy the Docker Compose stack
 echo "Deploying Docker Compose stack..."
-docker-compose down
-docker-compose up -d
+docker compose down
+docker compose up -d
 
-# Final message
 echo "Custom WireGuard container has been deployed with nftables support!"
+
 
 ## sudo ufw allow from <NPM_MACHINE_IP> to any port 8388
 
