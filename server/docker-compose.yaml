@@ -1,27 +1,40 @@
----
+
 services:
   wireguard:
-    image: lscr.io/linuxserver/wireguard:latest
+    image: linuxserver/wireguard
     container_name: wireguard
     cap_add:
-      - NET_ADMIN
-      - SYS_MODULE #optional
+      - NET_ADMIN                 # Required for networking capabilities
+      - SYS_MODULE                # Required for kernel module loading
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-      - SERVERPORT=51820 #optional
-      - PEERS=1 #optional
-      - PEERDNS=auto #optional
-      - INTERNAL_SUBNET=10.13.13.0 #optional
-      - ALLOWEDIPS=0.0.0.0/0 #optional
-      - PERSISTENTKEEPALIVE_PEERS= #optional
-      - LOG_CONFS=true #optional
+      - PUID=1000                 # Replace with the user ID of your Docker user
+      - PGID=1000                 # Replace with the group ID of your Docker user
+      - TZ=Etc/UTC                # Replace with your timezone (e.g., Europe/London)
+      - SERVERPORT=51820          # Internal WireGuard port (no need to expose externally)
+      - PEERS=1                   # Number of WireGuard peers (client configurations)
+      - PEERDNS=auto              # DNS for WireGuard clients (default: auto)
+      - INTERNAL_SUBNET=10.13.13.0/24 # Subnet for VPN routing
     volumes:
-      - /path/to/wireguard/config:/config
-      - /lib/modules:/lib/modules #optional
+      - /storage/vpn/wireguard-config:/config
+    restart: unless-stopped       # Automatically restart if the container stops
+
+  shadowsocks:
+    image: shadowsocks/shadowsocks-libev
+    container_name: shadowsocks
+    command:
+      - ss-server
+      - -s 0.0.0.0                # Listen on all network interfaces
+      - -p 8388                   # Shadowsocks port
+      - -k your_password          # Replace with a strong password for Shadowsocks
+      - -m aes-256-gcm            # Encryption method for secure communication
+      - --plugin v2ray-plugin     # Use v2ray-plugin for obfuscation
+      - --plugin-opts "server;path=/wireguard-ws" # WebSocket path for Shadowsocks
+    restart: unless-stopped       # Automatically restart if the container stops
     ports:
-      - 51820:51820/udp
-    sysctls:
-      - net.ipv4.conf.all.src_valid_mark=1
-    restart: unless-stopped
+      - "8388:8388"               # Expose port 8388 for Nginx Proxy Manager
+    volumes:
+      - /storage/vpn/shadowsocks-config:/etc/shadowsocks-libev # Optional for Shadowsocks config persistence
+
+networks:
+  default:
+    driver: bridge                # Use a bridge network for internal communication
