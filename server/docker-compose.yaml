@@ -16,11 +16,11 @@ services:
       - PEERDNS=auto               # Use automatic DNS for clients
       - INTERNAL_SUBNET=10.13.13.0/24 # Subnet for the VPN
     volumes:
-      - ./wireguard-config:/config
+      - /storage/vpn/wireguard-config:/config
     restart: unless-stopped
 
   shadowsocks:
-    image: shadowsocks/shadowsocks-libev
+    image: /storage/vpn/shadowsocks/shadowsocks-libev
     container_name: shadowsocks
     command:
       - ss-server
