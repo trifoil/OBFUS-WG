@@ -1,5 +1,8 @@
 
 services:
+
+  extra_hosts:
+    - "iptables-nft:iptables" # Passthrough for nftables compatibility
   wireguard:
     image: linuxserver/wireguard
     container_name: wireguard
