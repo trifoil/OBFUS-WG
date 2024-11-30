@@ -1,0 +1,13 @@
+services:
+  shadowsocks:
+    image: shadowsocks/shadowsocks-libev
+    container_name: shadowsocks
+    environment:
+      - PASSWORD=your_secure_password  # Change to a strong password
+      - SERVER=0.0.0.0  # Listen on all interfaces
+      - SERVER_PORT=1080  # Port for Shadowsocks
+      - METHOD=aes-256-gcm  # Encryption method
+      - TIMEOUT=300  # Timeout for connections
+    ports:
+      - "1080:1080"  # Expose Shadowsocks port
+    restart: unless-stopped
