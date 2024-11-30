@@ -5,8 +5,9 @@
 ## Server
 
 ```
-sudo dnf install iptables iptables-legacy
+sudo dnf install iptables iptables-legacy -y
 sudo alternatives --set iptables /usr/sbin/iptables-legacy
+sudo modprobe ip_tables
 
 sudo rm -rf OBFUS-WG/
 sudo dnf install git -y
