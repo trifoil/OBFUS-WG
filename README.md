@@ -23,6 +23,9 @@ cd ..
 ## Client
 
 
+First, install docker !
+
+
 ```
 sudo rm -rf OBFUS-WG/
 sudo dnf install git -y
