@@ -26,6 +26,21 @@ cd ..
 First, install docker !
 
 
+shadowsocks first.
+
+```
+docker run -d \
+  --name shadowsocks-client \
+  --restart unless-stopped \
+  -e SERVER=vpn.example.com \
+  -e SERVER_PORT=1080 \  # Replace with the Shadowsocks server port
+  -e PASSWORD=your_secure_password \  # Use the same password as configured on the server
+  -e METHOD=aes-256-gcm \  # Use the same encryption method
+  -p 1080:1080 \
+  shadowsocks/shadowsocks-libev ss-local -s vpn.example.com -p 1080 -k your_secure_password -m aes-256-gcm -b 0.0.0.0 -l 1080
+
+```
+
 ```
 sudo rm -rf OBFUS-WG/
 sudo dnf install git -y
